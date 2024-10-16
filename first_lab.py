@@ -1,43 +1,47 @@
 import random
 
 # Параметры
-M = 53  # Размер хеш-таблицы
-N = 5   # Размерность элементов
-MAX_ATTEMPTS = 30  # Максимальное количество попыток с квадратичными пробами
+m = 53  # Размер хеш-таблицы
+n = 5   # Размерность элементов
+max_attempts = 30  # Максимальное количество попыток с квадратичными пробами
 
 # Генерация уникальных элементов
 elements = set()
-while len(elements) < M:
+while len(elements) < m:
     element = random.randint(10000, 99999)  # Генерация 5-значного числа
     elements.add(element)
 
 elements = list(elements)
 
 # Хеш-таблица
-hash_table = [None] * M
+hash_table = [None] * m
 
 # Хеш-функция
 def hash_function(key):
     return key % 1000
 
+# Вставка с разрешением конфликтов
 total_steps = 0  # Общее количество шагов
 successful_insertions = 0  # Количество успешных вставок
 
 for element in elements:
     key = element
-    index = hash_function(key) % M
+    index = hash_function(key) % m
     i = 0
     steps = 0
     
-    while i < MAX_ATTEMPTS and hash_table[index] is not None:
+    # Квадратичные пробы
+    while i < max_attempts and hash_table[index] is not None:
         i += 1
         steps += 1
-        index = (hash_function(key) + i**2) % M
+        index = (hash_function(key) + i**2) % m
     
-    if i == MAX_ATTEMPTS:
-        for j in range(M):
+    # Если место не найдено, используем линейные пробы
+    if i == max_attempts:
+        # Линейные пробы
+        for j in range(m):
             steps += 1
-            index = (hash_function(key) + j) % M
+            index = (hash_function(key) + j) % m
             if hash_table[index] is None:
                 break
     
@@ -47,12 +51,17 @@ for element in elements:
     
     total_steps += steps
 
+# Вычисление коэффициента заполнения
 filled_cells = sum(1 for cell in hash_table if cell is not None)
-alpha = filled_cells / M
+alpha = filled_cells / m
 
+# Среднее число шагов для размещения элементов
 average_steps = total_steps / successful_insertions if successful_insertions > 0 else 0
 
-print("Хеш-таблица:")
+# Вывод результатов
+print("Сгенерированные ключи:")
+print(elements)
+print("\nХеш-таблица:")
 for i, value in enumerate(hash_table):
     print(f"Index {i}: {value}")
 
